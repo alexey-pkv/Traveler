@@ -1,0 +1,7 @@
+﻿# Build
+
+*/bin/*
+*/obj/*
+
+# IDE
+.idea
