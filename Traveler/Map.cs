@@ -26,12 +26,12 @@ public class Map<I, ND, CD> : IEnumerable
 
 	#region Private Methods
 
-	private Path<I, ND, CD>? FindShortcutPath(
+	private Path<I, ND, CD> FindShortcutPath(
 		List<EnterPoint<I, ND, CD>> start,
 		List<EnterPoint<I, ND, CD>> end,
 		INavigator<I, ND, CD> navigator)
 	{
-		Path<I, ND, CD> path = new(double.PositiveInfinity);
+		var path = Path<I, ND, CD>.NOT_FOUND;
 
 		foreach (var sp in start)
 		{
@@ -48,13 +48,17 @@ public class Map<I, ND, CD> : IEnumerable
 				path.To = ep;
 			}
 		}
-		
-		return path.IsFound ? path : null;
+
+		return path;
 	}
 
 	private void BuildShortcutPath(Path<I, ND, CD> path)
 	{
+		if (!path.IsFound)
+			throw new ArgumentException("Path not found");
 		
+		Step<I, ND, CD>.BuildShortcutPath(path.Steps, path.From.Node);
+		Step<I, ND, CD>.BuildShortcutPath(path.Steps, path.To.Node, true);
 	}
 
 	#endregion
@@ -121,16 +125,30 @@ public class Map<I, ND, CD> : IEnumerable
 		return dist;
 	}
 
+	public Path<I, ND, CD> FindShortcut(
+		List<EnterPoint<I, ND, CD>> start,
+		List<EnterPoint<I, ND, CD>> end,
+		INavigator<I, ND, CD> navigator)
+	{
+		var path = FindShortcutPath(start, end, navigator);
+
+		if (path.IsFound)
+		{
+			BuildShortcutPath(path);
+		}
+		
+		return path;
+	}
+
 	public Path<I, ND, CD> Find(
 		List<EnterPoint<I, ND, CD>> start,
 		List<EnterPoint<I, ND, CD>> end,
 		INavigator<I, ND, CD> navigator,
-		bool allowShortcuts = true)
+		bool allowShortcuts = true,
+		CancellationToken token = default)
 	{
 		Path<I, ND, CD>? shortcut = allowShortcuts ? FindShortcutPath(start, end, navigator) : null;
 		double bestDistance = shortcut?.Distance ?? double.PositiveInfinity;
-		
-		
 		
 		
 		

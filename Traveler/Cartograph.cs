@@ -16,16 +16,16 @@ public class Cartograph<I, ND, CD>(IRuler<I, ND, CD> ruler)
 	
 	#region Private Methods
 	
-	private void CalcShortcuts()
+	private void CalcShortcuts(CancellationToken ct)
 	{
 		Queue<Node<I, ND, CD>> queue = new();
-
+		
 		foreach (var nodes in Map)
 		{
 			queue.Enqueue(nodes);
 		}
 
-		while (queue.Count > 0)
+		while (queue.Count > 0 && !ct.IsCancellationRequested)
 		{
 			var next = queue.Dequeue();
 			var shortcut = next.Shortcut;
@@ -72,9 +72,9 @@ public class Cartograph<I, ND, CD>(IRuler<I, ND, CD> ruler)
 		return connection;
 	}
 	
-	public Map<I, ND, CD> Build()
+	public Map<I, ND, CD> Build(CancellationToken ct = default)
 	{
-		CalcShortcuts();
+		CalcShortcuts(ct);
 		
 		return Map;
 	}
