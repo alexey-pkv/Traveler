@@ -9,6 +9,7 @@ public readonly struct EnterPoint<I, ND, CD>(Node<I, ND, CD> node, double offset
 	public Node<I, ND, CD> Node { get; } = node;
 	public double Offset { get; } = offset;
 	public object? MetaData { get; init; } = metaData;
+	public I ID => Node.ID;
 
 	#endregion
 }

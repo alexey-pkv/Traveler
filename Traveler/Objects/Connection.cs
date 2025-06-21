@@ -37,7 +37,22 @@ public readonly struct Connection<I, ND, CD> where I : IComparable<I>
 	public bool Has(Node<I, ND, CD> node) => node == From || node == To;
 	public bool Has(I id) => From.ID.Equals(id) || To.ID.Equals(id);
 	public Node<I, ND, CD> Other(Node<I, ND, CD> other) => From == other ? To : From;
+	public Node<I, ND, CD> OtherByID(I id) => Other(ByID(id));
 	public override string ToString() => $"<Connection: {From} -> {To}>";
+
+	public Node<I, ND, CD> ByID(I id)
+	{
+		if (id.CompareTo(From.ID) == 0)
+		{
+			return From;
+		}
+		else if (id.CompareTo(To.ID) == 0)
+		{
+			return To;
+		}
+		
+		throw new ArgumentException($"Invalid ID {id}");
+	}
 	
 	#endregion
 }
