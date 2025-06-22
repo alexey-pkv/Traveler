@@ -2,7 +2,7 @@
 
 
 public readonly struct Shortcut<I, ND, CD>
-	where I : IComparable<I>
+	where I : struct, IComparable<I>
 {
 	#region Properties
 	

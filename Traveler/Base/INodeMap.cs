@@ -4,7 +4,7 @@
 namespace Traveler.Base;
 
 
-public interface INodeMap<I, ND, CD> where I : IComparable<I>
+public interface INodeMap<I, ND, CD> where I : struct, IComparable<I>
 {
 	public int Count { get; }
 	public bool IsEmpty { get; }

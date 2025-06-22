@@ -5,7 +5,7 @@ namespace Traveler;
 
 
 public interface INavigator<I, ND, CD> 
-	where I : IComparable<I>
+	where I : struct, IComparable<I>
 {
 	#region Methods
 	

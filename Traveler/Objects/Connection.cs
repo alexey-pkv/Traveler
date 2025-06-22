@@ -1,7 +1,7 @@
 ﻿namespace Traveler.Objects;
 
 
-public readonly struct Connection<I, ND, CD> where I : IComparable<I>
+public readonly struct Connection<I, ND, CD> where I : struct, IComparable<I>
 {
 	#region Public Properties
 	

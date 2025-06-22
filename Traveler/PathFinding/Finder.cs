@@ -1,22 +1,26 @@
-﻿using Traveler.Base;
+﻿using System.Data;
+using Traveler.Base;
 using Traveler.Objects;
 
 
 namespace Traveler.PathFinding;
 
 
-public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<I>
+public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : struct, IComparable<I>
 {
 	#region Private Data Members
 	
-	private INavigator<I, ND, CD>	m_navigator = null;
+	private INavigator<I, ND, CD>?	m_navigator = null;
 	private CancellationToken		m_token		= CancellationToken.None;
 	
 	private SearchCursor<I, ND, CD> m_source	= new();
 	private SearchCursor<I, ND, CD> m_target	= new();
 	
+	private List<EnterPoint<I, ND, CD>>? m_start	= null;
+	private List<EnterPoint<I, ND, CD>>? m_end		= null;
+	
 	private double	m_minDistance	= double.PositiveInfinity;
-	private I		m_foundNode		= default;
+	private I		m_foundID		= default;
 	private bool	m_isFound		= false;
 	
 	#endregion
@@ -26,8 +30,45 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 
 	private Path<I, ND, CD> BuildFoundPath()
 	{
-		Path<I, ND, CD> path = new();
+		if (!m_isFound) return Path<I, ND, CD>.NOT_FOUND;
 		
+		var a = m_source.RequireByID(m_foundID);
+		var b = m_target.RequireByID(m_foundID);
+		var n = a;
+		
+		Path<I, ND, CD> path = new(
+			distance: a.DistanceTravelled + b.DistanceTravelled, 
+			capacity: a.StepsCount + b.StepsCount)
+		{
+			From	= m_start![a.EntryPointIndex],
+			To		= m_end![b.EntryPointIndex]
+		};
+
+		for (int i = 0; i < a.StepsCount; i++)
+		{
+			path.Steps.Add(
+				new Step<I, ND, CD>(
+					connection: n.Via,
+					from: n.FromNode
+				));
+			
+			n = m_source.RequireByIndex(n.From);
+		}
+		
+		path.Steps.Reverse(0, path.Steps.Count - 1);
+		n = b;
+		
+		for (int i = 0; i < b.StepsCount; i++)
+		{
+			path.Steps.Add(
+				new Step<I, ND, CD>(
+					connection: n.Via,
+					from: n.HeadNode
+				));
+			
+			n = m_source.RequireByIndex(n.From);
+		}
+
 		return path;
 	}
 	
@@ -61,6 +102,9 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 		List<EnterPoint<I, ND, CD>> start,
 		List<EnterPoint<I, ND, CD>> end)
 	{
+		if (m_navigator == null)
+			throw new NoNullAllowedException("Navigator must be set!");
+		
 		var index = 0;
 		
 		foreach (var ep in start)
@@ -100,21 +144,21 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 			
 			if (other.TryGet(to.ID, out var existing))
 			{
-				var pathDistance = existing.DistanceTravelled + next.DistanceTravelled + conn.Distance;
+				var pathDistance = existing!.DistanceTravelled + next.DistanceTravelled + conn.Distance;
 				
 				cursor.Visited(to.ID);
 				
 				if (pathDistance < m_minDistance)
 				{
 					m_minDistance	= pathDistance;
-					m_foundNode		= to.ID;
+					m_foundID		= to.ID;
 					m_isFound		= true;
 				}
 				
 				continue;
 			}
 			
-			var distance = PredictDistance(m_navigator, to, targets);
+			var distance = PredictDistance(m_navigator!, to, targets);
 			
 			if (double.IsPositiveInfinity(distance))
 				continue;
@@ -126,22 +170,23 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 		}
 	}
 	
-	private Path<I, ND, CD> TryFind(
-		List<EnterPoint<I, ND, CD>> start,
-		List<EnterPoint<I, ND, CD>> end)
+	private Path<I, ND, CD> TryFind()
 	{
-		SetupCursor(m_source, start, end);
-		SetupCursor(m_target, end, start);
+		if (m_start == null || m_end == null)
+			throw new NoNullAllowedException();
+		
+		SetupCursor(m_source, m_start, m_end);
+		SetupCursor(m_target, m_end, m_start);
 		
 		while (m_source.HasNext() && m_target.HasNext())
 		{
 			m_token.ThrowIfCancellationRequested();
 			
-			ProcessNext(m_source, m_target, end);
-			ProcessNext(m_target, m_source, start);
+			ProcessNext(m_source, m_target, m_end);
+			ProcessNext(m_target, m_source, m_start);
 		}
 		
-		return m_isFound ? BuildFoundPath() : Path<I, ND, CD>.NOT_FOUND;
+		return BuildFoundPath();
 	}
 	
 	#endregion
@@ -177,13 +222,24 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 		return this;
 	}
 	
-	public Path<I, ND, CD> Find(
-		List<EnterPoint<I, ND, CD>> start,
-		List<EnterPoint<I, ND, CD>> end)
+	public Finder<I, ND, CD> From(List<EnterPoint<I, ND, CD>> ep)
+	{
+		m_start = ep;
+		return this;
+	}
+	
+	public Finder<I, ND, CD> To(List<EnterPoint<I, ND, CD>> ep)
+	{
+		m_end = ep;
+		return this;
+	}
+	
+	
+	public Path<I, ND, CD> Find()
 	{
 		try
 		{
-			return TryFind(start, end);
+			return TryFind();
 		}
 		finally
 		{

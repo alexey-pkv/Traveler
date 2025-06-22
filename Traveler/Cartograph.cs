@@ -6,7 +6,7 @@ namespace Traveler;
 
 
 public class Cartograph<I, ND, CD>(IRuler<I, ND, CD> ruler)
-	where I : IComparable<I>
+	where I : struct, IComparable<I>
 {
 	#region Private Data Members
 

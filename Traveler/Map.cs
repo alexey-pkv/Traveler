@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using Traveler.Base;
-using Traveler.Exceptions;
 using Traveler.Objects;
 using Traveler.PathFinding;
 
@@ -9,7 +8,7 @@ namespace Traveler;
 
 
 public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable, INodeMap<I, ND, CD> 
-	where I : IComparable<I>
+	where I : struct, IComparable<I>
 {
 	#region Data Members
 	
@@ -136,18 +135,26 @@ public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable
 		bool allowShortcuts = true,
 		CancellationToken token = default)
 	{
-		var shortcut = allowShortcuts ? FindShortcutPath(start, end, navigator) : null;
-		var bestDistance = shortcut?.Distance ?? double.PositiveInfinity;
+		var shortcut = Path<I, ND, CD>.NOT_FOUND;
 		var finder = new Finder<I, ND, CD>(this);
 		
-		finder
+		if (allowShortcuts)
+			shortcut = FindShortcutPath(start, end, navigator);
+		
+		var path = finder
 			.With(navigator)
 			.With(token)
-			.WithAtMost(bestDistance);
+			.WithAtMost(shortcut.Distance)
+			.From(start)
+			.To(end)
+			.Find();
 		
-		var path = finder.Find(start, end);
+		if (!path.IsFound && shortcut.IsFound)
+		{
+			path = shortcut;
+		}
 		
-		return null;
+		return path;
 	}
 	
 	#endregion

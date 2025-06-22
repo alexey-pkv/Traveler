@@ -5,7 +5,7 @@ namespace Traveler.Objects;
 
 
 public class Node<I, ND, PD>(I id, ND? data)
-	where I : IComparable<I>
+	where I : struct, IComparable<I>
 {
 	#region Properties
 	

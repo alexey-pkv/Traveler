@@ -4,13 +4,13 @@
 namespace Traveler.PathFinding;
 
 
-public class SearchHead<I, ND, CD> : IComparable<SearchHead<I, ND, CD>> where I : IComparable<I>
+public class SearchHead<I, ND, CD> : IComparable<SearchHead<I, ND, CD>> where I : struct, IComparable<I>
 {
 	#region Public Properties
 
 	public int Index { get; set; } = 0;
 	public int From { get; init; } = -1;
-	public int StepsCount { get; init; } = 1;
+	public int StepsCount { get; init; } = 0;
 	public required I Head { get; init; }
 	public required int EntryPointIndex { get; init; }
 	public required Connection<I, ND, CD> Via { get; init; }

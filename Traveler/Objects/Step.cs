@@ -2,7 +2,7 @@
 
 
 public readonly struct Step<I, ND, CD>(Connection<I, ND, CD> connection, Node<I, ND, CD> from)
-	where I : IComparable<I>
+	where I : struct, IComparable<I>
 {
 	#region Properties
 	

@@ -4,7 +4,7 @@
 namespace Traveler.PathFinding;
 
 
-public struct SearchCursor<I, ND, CD> where I : IComparable<I>
+public struct SearchCursor<I, ND, CD> where I : struct, IComparable<I>
 {
 	#region Private Data Members
 	
@@ -42,6 +42,26 @@ public struct SearchCursor<I, ND, CD> where I : IComparable<I>
 		existing = m_all[result];
 		
 		return true;
+	}
+	
+	public SearchHead<I, ND, CD> RequireByID(I id)
+	{
+		if (!TryGet(id, out var result))
+		{
+			throw new KeyNotFoundException();
+		}
+		
+		return result ?? throw new InvalidOperationException();
+	}
+	
+	public SearchHead<I, ND, CD> RequireByIndex(int index)
+	{
+		if (index < 0 || index >= m_all.Count)
+		{
+			throw new ArgumentOutOfRangeException(nameof(index));
+		}
+		
+		return m_all[index];
 	}
 
 	public SearchHead<I, ND, CD> Next()
