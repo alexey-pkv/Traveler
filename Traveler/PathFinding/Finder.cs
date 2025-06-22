@@ -141,11 +141,7 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 			ProcessNext(m_target, m_source, start);
 		}
 		
-		var path = m_isFound ? BuildFoundPath() : Path<I, ND, CD>.NOT_FOUND;
-		
-		Clear();
-		
-		return path;
+		return m_isFound ? BuildFoundPath() : Path<I, ND, CD>.NOT_FOUND;
 	}
 	
 	#endregion
