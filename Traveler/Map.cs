@@ -37,7 +37,7 @@ public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable
 		foreach (var sp in start)
 		{
 			foreach (var ep in end)
-			{
+			{				
 				var offset = sp.Offset + ep.Offset;
 				var distance = GetShortcutDistance(sp.Node, ep.Node, navigator);
 				
@@ -98,8 +98,13 @@ public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable
 	
 	#region Public Path Find Methods
 
-	public double GetShortcutDistance(Node<I, ND, CD> from, Node<I, ND, CD> to, INavigator<I, ND, CD>? navigator = null)
+	public double GetShortcutDistance(
+		Node<I, ND, CD>? from, 
+		Node<I, ND, CD>? to, 
+		INavigator<I, ND, CD>? navigator = null)
 	{
+		if (from == null || to == null)
+			return double.PositiveInfinity;
 		if (!from.HasShortcut || !to.HasShortcut)
 			return double.PositiveInfinity;
 		

@@ -32,8 +32,11 @@ public readonly struct Step<I, ND, CD>(Connection<I, ND, CD> connection, Node<I,
 		return flip ? step.Flip() : step;
 	}
 	
-	public static void BuildShortcutPath(List<Step<I, ND, CD>> into, Node<I, ND, CD> from, bool flip = false)
+	public static void BuildShortcutPath(List<Step<I, ND, CD>> into, Node<I, ND, CD>? from, bool flip = false)
 	{
+		if (from == null)
+			throw new ArgumentNullException(nameof(from));
+		
 		int offset = into.Count;
 		
 		while (!from.IsShortcut)

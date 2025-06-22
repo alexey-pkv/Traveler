@@ -1,7 +1,7 @@
 ﻿namespace Traveler.Objects;
 
 
-public readonly struct EnterPoint<I, ND, CD>(Node<I, ND, CD>? node, double offset = 0.0, object? metaData = null)
+public readonly struct EnterPoint<I, ND, CD>(Node<I, ND, CD>? node = null, double offset = 0.0, object? metaData = null)
 	where I : struct, IComparable<I>
 {
 	#region Properties

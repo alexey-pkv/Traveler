@@ -81,6 +81,9 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : struct, ICom
 		
 		foreach (var ep in to)
 		{
+			if (ep.Node == null)
+				throw new NullReferenceException("Node in an entry point must be set!");
+			
 			var curr = navigator.PredictDistance(from, ep.Node);
 
 			if (double.IsPositiveInfinity(curr))
@@ -109,6 +112,9 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : struct, ICom
 		
 		foreach (var ep in start)
 		{
+			if (ep.Node == null)
+				throw new NullReferenceException("Node in an entry point must be set!");
+			
 			var remaining = PredictDistance(m_navigator, ep.Node, end);
 			var sp = SearchHead<I, ND, CD>.First(index++, ep, remaining);
 			
