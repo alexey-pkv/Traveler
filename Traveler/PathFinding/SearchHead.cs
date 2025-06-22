@@ -36,15 +36,12 @@ public class SearchHead<I, ND, CD> : IComparable<SearchHead<I, ND, CD>> where I 
 	#region Public Methods
 
 	public SearchHead<I, ND, CD> Next(
-		int index,
-		I head,
 		Connection<I, ND, CD> via,
 		double distanceRemaining)
 	{
 		return new SearchHead<I, ND, CD>
 		{
-			Index = index,
-			Head = head,
+			Head = via.OtherByID(Head).ID,
 			From = Index,
 			Via = via,
 			StepsCount = StepsCount + 1,

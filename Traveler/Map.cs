@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using Traveler.Base;
 using Traveler.Exceptions;
 using Traveler.Objects;
 using Traveler.PathFinding;
@@ -7,7 +8,7 @@ using Traveler.PathFinding;
 namespace Traveler;
 
 
-public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable 
+public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable, INodeMap<I, ND, CD> 
 	where I : IComparable<I>
 {
 	#region Data Members
@@ -69,6 +70,15 @@ public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable
 	
 	public bool Has(I id) => m_nodes.ContainsKey(id);
 	public Node<I, ND, CD>? Get(I id) => m_nodes.GetValueOrDefault(id);
+	public Node<I, ND, CD> Require(I id)
+	{
+		if (!m_nodes.TryGetValue(id, out var node))
+		{
+			throw new KeyNotFoundException($"ID {id} not found");
+		}
+		
+		return node;
+	}
 
 	public bool TryGet(I id, out Node<I, ND, CD>? node) => m_nodes.TryGetValue(id, out node);
 	
@@ -119,51 +129,6 @@ public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable
 		return path;
 	}
 
-	private double PredictDistance(
-		INavigator<I, ND, CD> navigator,
-		Node<I, ND, CD> from, 
-		List<EnterPoint<I, ND, CD>> to)
-	{
-		var min = double.PositiveInfinity;
-		
-		foreach (var ep in to)
-		{
-			var curr = navigator.PredictDistance(from, ep.Node);
-
-			if (double.IsPositiveInfinity(curr))
-				continue;
-			
-			curr += ep.Offset;
-
-			if (curr < min)
-			{
-				min = curr;
-			}
-		}
-
-		return min;
-	}
-
-	private SearchCursor<I, ND, CD> CreateCursor(
-		INavigator<I, ND, CD> navigator,
-		List<EnterPoint<I, ND, CD>> start,
-		List<EnterPoint<I, ND, CD>> end)
-	{
-		var cursor = new SearchCursor<I, ND, CD>();
-		
-		foreach (var ep in start)
-		{
-			var remaining = PredictDistance(navigator, ep.Node, end);
-			
-			if (double.IsPositiveInfinity(remaining))
-				continue;
-			
-			cursor.Add(SearchHead<I, ND, CD>.First(ep, remaining));
-		}
-
-		return cursor;
-	}
-
 	public Path<I, ND, CD> Find(
 		List<EnterPoint<I, ND, CD>> start,
 		List<EnterPoint<I, ND, CD>> end,
@@ -171,19 +136,16 @@ public class Map<I, ND, CD>(Dictionary<I, Node<I, ND, CD>> source) : IEnumerable
 		bool allowShortcuts = true,
 		CancellationToken token = default)
 	{
-		Path<I, ND, CD>? shortcut = allowShortcuts ? FindShortcutPath(start, end, navigator) : null;
-		double bestDistance = shortcut?.Distance ?? double.PositiveInfinity;
+		var shortcut = allowShortcuts ? FindShortcutPath(start, end, navigator) : null;
+		var bestDistance = shortcut?.Distance ?? double.PositiveInfinity;
+		var finder = new Finder<I, ND, CD>(this);
 		
-		var startCursor = CreateCursor(navigator, start, end);
-		var endCursor = CreateCursor(navigator, end, start);
-
-		while (
-			!token.IsCancellationRequested &&
-			startCursor.HasNext() &&
-			endCursor.HasNext())
-		{
-			
-		}
+		finder
+			.With(navigator)
+			.With(token)
+			.WithAtMost(bestDistance);
+		
+		var path = finder.Find(start, end);
 		
 		return null;
 	}
