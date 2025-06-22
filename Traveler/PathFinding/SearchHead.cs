@@ -12,6 +12,7 @@ public class SearchHead<I, ND, CD> : IComparable<SearchHead<I, ND, CD>> where I 
 	public int From { get; init; } = -1;
 	public int StepsCount { get; init; } = 1;
 	public required I Head { get; init; }
+	public required int EntryPointIndex { get; init; }
 	public required Connection<I, ND, CD> Via { get; init; }
 	public required double DistanceTravelled { get; init; }
 	public required double DistanceRemaining { get; init; }
@@ -45,6 +46,7 @@ public class SearchHead<I, ND, CD> : IComparable<SearchHead<I, ND, CD>> where I 
 			From = Index,
 			Via = via,
 			StepsCount = StepsCount + 1,
+			EntryPointIndex = EntryPointIndex,
 			DistanceTravelled = DistanceTravelled + via.Distance,
 			DistanceRemaining = distanceRemaining
 		};
@@ -55,14 +57,15 @@ public class SearchHead<I, ND, CD> : IComparable<SearchHead<I, ND, CD>> where I 
 
 	#region Public Static Methods
 
-	public static SearchHead<I, ND, CD> First(EnterPoint<I, ND, CD> ep, double remaining)
+	public static SearchHead<I, ND, CD> First(int epIndex, EnterPoint<I, ND, CD> ep, double remaining)
 	{
 		return new SearchHead<I, ND, CD>
 		{
 			Head = ep.ID,
 			Via = default,
 			DistanceTravelled = 0,
-			DistanceRemaining = remaining
+			DistanceRemaining = remaining,
+			EntryPointIndex = epIndex
 		};
 	}
 

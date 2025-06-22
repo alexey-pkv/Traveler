@@ -13,7 +13,7 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 	private CancellationToken		m_token		= CancellationToken.None;
 	
 	private SearchCursor<I, ND, CD> m_source	= new();
-	private SearchCursor<I, ND, CD> m_target		= new();
+	private SearchCursor<I, ND, CD> m_target	= new();
 	
 	private double	m_minDistance	= double.PositiveInfinity;
 	private I		m_foundNode		= default;
@@ -23,6 +23,13 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 	
 	
 	#region Private Methods
+
+	private Path<I, ND, CD> BuildFoundPath()
+	{
+		Path<I, ND, CD> path = new();
+		
+		return path;
+	}
 	
 	private double PredictDistance(
 		INavigator<I, ND, CD> navigator,
@@ -54,9 +61,12 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 		List<EnterPoint<I, ND, CD>> start,
 		List<EnterPoint<I, ND, CD>> end)
 	{
+		var index = 0;
+		
 		foreach (var ep in start)
 		{
 			var remaining = PredictDistance(m_navigator, ep.Node, end);
+			var sp = SearchHead<I, ND, CD>.First(index++, ep, remaining);
 			
 			if (double.IsPositiveInfinity(remaining) || 
 			    (!double.IsPositiveInfinity(m_minDistance) && m_minDistance <= remaining))
@@ -64,7 +74,7 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 				continue;
 			}	
 			
-			cursor.Add(SearchHead<I, ND, CD>.First(ep, remaining));
+			cursor.Add(sp);
 		}
 	}
 	
@@ -131,10 +141,11 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : IComparable<
 			ProcessNext(m_target, m_source, start);
 		}
 		
-		if (!m_isFound)
-			return null;
+		var path = m_isFound ? BuildFoundPath() : Path<I, ND, CD>.NOT_FOUND;
 		
+		Clear();
 		
+		return path;
 	}
 	
 	#endregion
