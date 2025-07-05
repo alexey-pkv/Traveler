@@ -21,9 +21,12 @@ public class Cartograph<I, ND, CD>(IRuler<I, ND, CD> ruler)
 	{
 		Queue<Node<I, ND, CD>> queue = new();
 		
-		foreach (var nodes in map)
+		foreach (var node in map)
 		{
-			queue.Enqueue(nodes);
+			if (node.IsShortcut)
+			{
+				queue.Enqueue(node);
+			}
 		}
 
 		while (queue.Count > 0 && !ct.IsCancellationRequested)

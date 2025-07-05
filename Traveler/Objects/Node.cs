@@ -24,10 +24,19 @@ public class Node<I, ND, PD>(I id, ND? data)
 	
 	public void Connect(Connection<I, ND, PD> connection)
 	{
-		if (connection.Has(this))
+		if (!connection.Has(this))
 		{
 			throw new InvalidConnectionException(
 				"The given connection is not connected to the current node. " + 
+				$"Got {this} and {connection}.");
+		}
+		
+		var id = connection.Other(this).ID;
+		
+		if (Neighbors.ContainsKey(id))
+		{
+			throw new InvalidConnectionException(
+				"The given connection was already set. " + 
 				$"Got {this} and {connection}.");
 		}
 		else
