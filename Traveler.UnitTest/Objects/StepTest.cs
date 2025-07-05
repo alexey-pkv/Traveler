@@ -254,5 +254,25 @@ public class StepTest
 	    Assert.Throws<ArgumentNullException>(() => Step<int, int, int>.BuildShortcutPath([], null));
 	}
 
+	[Test]
+	public void BuildShortcutPath_OneNodeDoesNotHAveAShortcut_ExceptionThrown()
+	{
+	    var node_1 = CreateTestNode(1, 10);
+	    var node_2 = CreateTestNode(2, 20);
+	    var node_3 = CreateTestNode(3, 30);
+	    
+	    CreateConnection(node_1, node_2, 12);
+	    CreateConnection(node_2, node_3, 23);
+	    
+	    node_1.IsShortcut = true;
+	    
+	    // Set an empty shortcut.
+	    node_2.Shortcut = new Shortcut<int, int, int>();
+	    node_3.Shortcut = CreateShortcut(node_1, node_2, 20);
+	    
+	    
+	    Assert.Throws<InvalidDataException>(() => Step<int, int, int>.BuildShortcutPath([], node_3));
+	}
+
 	#endregion
 }
