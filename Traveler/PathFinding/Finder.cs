@@ -84,7 +84,7 @@ public class Finder<I, ND, CD>(INodeMap<I, ND, CD> m_map) where I : struct, ICom
 			if (ep.Node == null)
 				throw new NullReferenceException("Node in an entry point must be set!");
 			
-			var curr = navigator.PredictDistance(from, ep.Node);
+			var curr = navigator.PredictDistance(from, [ep.Node]);
 
 			if (double.IsPositiveInfinity(curr))
 				continue;
