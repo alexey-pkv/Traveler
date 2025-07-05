@@ -7,8 +7,8 @@ public readonly struct Step<I, ND, CD>(Connection<I, ND, CD> connection, Node<I,
 	#region Properties
 	
 	public Connection<I, ND, CD> Connection { get; } = connection;
-	public double DistanceTraversed { get; init; } = connection.Distance;
-	public Node<I, ND, CD> From { get; init; } = from;
+	public double DistanceTraversed { get; } = connection.Distance;
+	public Node<I, ND, CD> From { get; } = from;
 
 	public double Distance => Connection.Distance;
 	public Node<I, ND, CD> To => Connection.Other(From);
@@ -27,7 +27,7 @@ public readonly struct Step<I, ND, CD>(Connection<I, ND, CD> connection, Node<I,
 
 	public static Step<I, ND, CD> FromShortcut(Node<I, ND, CD> node, bool flip = false)
 	{
-		var step = new Step<I, ND, CD>(new Connection<I, ND, CD>(node, node.Shortcut.Via), node);
+		var step = new Step<I, ND, CD>(node.Neighbors[node.Shortcut.Via.ID], node);
 		
 		return flip ? step.Flip() : step;
 	}
