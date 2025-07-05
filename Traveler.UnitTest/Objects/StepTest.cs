@@ -236,5 +236,23 @@ public class StepTest
 	    Assert.AreEqual(connection_3, steps[2].Connection);
 	}
 
+	[Test]
+	public void BuildShortcutPath_FromIsNull_ExceptionThrown()
+	{
+	    var node_1 = CreateTestNode(1, 10);
+	    var node_2 = CreateTestNode(2, 20);
+	    var node_3 = CreateTestNode(3, 30);
+	    
+	    CreateConnection(node_1, node_2, 12);
+	    CreateConnection(node_2, node_3, 23);
+	    
+	    node_1.IsShortcut = true;
+	    node_2.Shortcut = CreateShortcut(node_1, node_1, 10);
+	    node_3.Shortcut = CreateShortcut(node_1, node_2, 20);
+	    
+	    
+	    Assert.Throws<ArgumentNullException>(() => Step<int, int, int>.BuildShortcutPath([], null));
+	}
+
 	#endregion
 }
