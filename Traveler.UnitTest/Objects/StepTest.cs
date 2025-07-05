@@ -145,4 +145,96 @@ public class StepTest
 	}
 	
 	#endregion
+	
+	#region Test BuildShortcutPath
+	
+	[Test]
+	public void BuildShortcutPath_FlipFalse_Test()
+	{
+	    var node_1 = CreateTestNode(1, 10);
+	    var node_2 = CreateTestNode(2, 20);
+	    var node_3 = CreateTestNode(3, 30);
+	    var node_4 = CreateTestNode(4, 40);
+	    
+	    // Set up connections
+	    var connection_1 = CreateConnection(node_1, node_2, 12);
+	    var connection_2 = CreateConnection(node_2, node_3, 23);
+	    var connection_3 = CreateConnection(node_3, node_4, 34);
+	    
+	    // Set up shortcuts chain: node_4 -> node_3 -> node_2 -> node_1 (shortcut)
+	    node_1.IsShortcut = true;
+	    
+	    node_2.Shortcut = CreateShortcut(node_1, node_1, 10);
+	    node_3.Shortcut = CreateShortcut(node_1, node_2, 20);
+	    node_4.Shortcut = CreateShortcut(node_1, node_3, 30);
+	    
+	    var steps = new List<Step<int, int, int>>();
+	    
+	    
+	    Step<int, int, int>.BuildShortcutPath(steps, node_4, false);
+	    
+	    
+	    Assert.AreEqual(3, steps.Count);
+	    
+	    // First step: node_4 -> node_3
+	    Assert.AreEqual(node_4, steps[0].From);
+	    Assert.AreEqual(node_3, steps[0].To);
+	    Assert.AreEqual(connection_3, steps[0].Connection);
+	    
+	    // Second step: node_3 -> node_2  
+	    Assert.AreEqual(node_3, steps[1].From);
+	    Assert.AreEqual(node_2, steps[1].To);
+	    Assert.AreEqual(connection_2, steps[1].Connection);
+	    
+	    // Third step: node_2 -> node_1
+	    Assert.AreEqual(node_2, steps[2].From);
+	    Assert.AreEqual(node_1, steps[2].To);
+	    Assert.AreEqual(connection_1, steps[2].Connection);
+	}
+
+	[Test]
+	public void BuildShortcutPath_FlipTrue_Test()
+	{
+	    var node_1 = CreateTestNode(1, 10);
+	    var node_2 = CreateTestNode(2, 20);
+	    var node_3 = CreateTestNode(3, 30);
+	    var node_4 = CreateTestNode(4, 40);
+	    
+	    // Set up connections
+	    var connection_1 = CreateConnection(node_1, node_2, 12);
+	    var connection_2 = CreateConnection(node_2, node_3, 23);
+	    var connection_3 = CreateConnection(node_3, node_4, 34);
+	    
+	    // Set up shortcuts chain: node_4 -> node_3 -> node_2 -> node_1 (shortcut)
+	    node_1.IsShortcut = true;
+	    
+	    node_2.Shortcut = CreateShortcut(node_1, node_1, 10);
+	    node_3.Shortcut = CreateShortcut(node_1, node_2, 20);
+	    node_4.Shortcut = CreateShortcut(node_1, node_3, 30);
+	    
+	    var steps = new List<Step<int, int, int>>();
+	    
+	    
+	    Step<int, int, int>.BuildShortcutPath(steps, node_4, true);
+	    
+	    
+	    Assert.AreEqual(3, steps.Count);
+	    
+	    // First step: node_1 -> node_2
+	    Assert.AreEqual(node_1, steps[0].From);
+	    Assert.AreEqual(node_2, steps[0].To);
+	    Assert.AreEqual(connection_1, steps[0].Connection);
+	    
+	    // Second step: node_2 -> node_3
+	    Assert.AreEqual(node_2, steps[1].From);
+	    Assert.AreEqual(node_3, steps[1].To);
+	    Assert.AreEqual(connection_2, steps[1].Connection);
+	    
+	    // Third step: node_3 -> node_4
+	    Assert.AreEqual(node_3, steps[2].From);
+	    Assert.AreEqual(node_4, steps[2].To);
+	    Assert.AreEqual(connection_3, steps[2].Connection);
+	}
+
+	#endregion
 }
