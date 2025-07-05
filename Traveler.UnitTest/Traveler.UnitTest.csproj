@@ -7,14 +7,15 @@
 
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <NoWarn>1701;1702;NUnit2005</NoWarn>
+      <NoWarn>1701;1702;NUnit2005;NUnit2015</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <NoWarn>1701;1702;NUnit2005</NoWarn>
+      <NoWarn>1701;1702;NUnit2005;NUnit2015</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
