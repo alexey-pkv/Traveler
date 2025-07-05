@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Traveler", "Traveler\Travel
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Traveler.UnitTest", "Traveler.UnitTest\Traveler.UnitTest.csproj", "{F949FC23-8E99-460D-AC60-D7B714B53C87}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Traveler.UnitTest.Lib", "Traveler.UnitTest.Lib\Traveler.UnitTest.Lib.csproj", "{59C18EE1-649A-4EFC-8FCD-35DFE8DF90F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{F949FC23-8E99-460D-AC60-D7B714B53C87}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F949FC23-8E99-460D-AC60-D7B714B53C87}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F949FC23-8E99-460D-AC60-D7B714B53C87}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59C18EE1-649A-4EFC-8FCD-35DFE8DF90F8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59C18EE1-649A-4EFC-8FCD-35DFE8DF90F8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59C18EE1-649A-4EFC-8FCD-35DFE8DF90F8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59C18EE1-649A-4EFC-8FCD-35DFE8DF90F8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

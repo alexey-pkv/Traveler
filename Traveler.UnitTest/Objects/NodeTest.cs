@@ -1,5 +1,5 @@
 ﻿using Traveler.Exceptions;
-using Traveler.Objects;
+using Traveler.UnitTest.Lib;
 
 
 namespace Traveler.UnitTest.Objects;
@@ -8,35 +8,15 @@ namespace Traveler.UnitTest.Objects;
 [TestFixture]
 public class NodeTest
 {
-	#region Private Methods
-	
-	private Node<int, object, object> CreateNode(int id)
-	{
-		return new Node<int, object, object>(id, null);
-	}
-	
-	private Connection<int, object, object> CreateConnection(
-		Node<int, object, object> node1, 
-		Node<int, object, object> node2)
-	{
-		return new Connection<int, object, object>(node1, node2);
-	}
-	
-	#endregion
-	
-	
 	#region Test Connect
     
     [Test]
     public void Connect_ConnectionAddedWithCorrectKey()
     {
-        var subject_1 = CreateNode(1);
-        var subject_2 = CreateNode(2);
-        var conn_1 = CreateConnection(subject_1, subject_2);
+        var subject_1 = Create.Node(1);
+        var subject_2 = Create.Node(2);
         
-        
-        subject_1.Connect(conn_1);
-        subject_2.Connect(conn_1);
+        Create.Connection(subject_1, subject_2);
         
         
         Assert.AreEqual(1, subject_2.Neighbors.Count);
@@ -49,9 +29,9 @@ public class NodeTest
     [Test]
     public void Connect_ConnectionReAdded_ExceptionThrown()
     {
-        var subject_1 = CreateNode(1);
-        var subject_2 = CreateNode(2);
-        var conn_1 = CreateConnection(subject_1, subject_2);
+        var subject_1 = Create.Node(1);
+        var subject_2 = Create.Node(2);
+        var conn_1 = Create.Connection(subject_1, subject_2, connect_nodes: false);
         
         
         subject_1.Connect(conn_1);
@@ -63,10 +43,10 @@ public class NodeTest
     [Test]
     public void Connect_ConnectionWithoutNode_ExceptionThrown()
     {
-        var subject_1 = CreateNode(1);
-        var subject_2 = CreateNode(2);
-        var subject_3 = CreateNode(3);
-        var conn_1 = CreateConnection(subject_2, subject_3);
+        var subject_1 = Create.Node(1);
+        var subject_2 = Create.Node(2);
+        var subject_3 = Create.Node(3);
+        var conn_1 = Create.Connection(subject_2, subject_3, connect_nodes: false);
         
         Assert.Throws<InvalidConnectionException>(() => subject_1.Connect(conn_1));
     }
@@ -79,9 +59,9 @@ public class NodeTest
     [Test]
     public void HasNeighbor_NeighborAdded_ReturnsTrue()
     {
-        var subject_1 = CreateNode(1);
-        var subject_2 = CreateNode(2);
-        var conn_1 = CreateConnection(subject_1, subject_2);
+        var subject_1 = Create.Node(1);
+        var subject_2 = Create.Node(2);
+        var conn_1 = Create.Connection(subject_1, subject_2, connect_nodes: false);
         
         
         subject_1.Connect(conn_1);
@@ -93,10 +73,10 @@ public class NodeTest
     [Test]
     public void HasNeighbor_NotANeighbor_ReturnsFalse()
     {
-        var subject_1 = CreateNode(1);
-        var subject_2 = CreateNode(2);
-        var subject_3 = CreateNode(3);
-        var conn_1 = CreateConnection(subject_1, subject_2);
+        var subject_1 = Create.Node(1);
+        var subject_2 = Create.Node(2);
+        var subject_3 = Create.Node(3);
+        var conn_1 = Create.Connection(subject_1, subject_2, connect_nodes: false);
         
         
         subject_1.Connect(conn_1);
@@ -114,7 +94,7 @@ public class NodeTest
     [Test]
     public void ToString_ValidStringReturned()
     {
-        var subject_1 = CreateNode(1);
+        var subject_1 = Create.Node(1);
         
         Assert.AreEqual("<Node: 1>", subject_1.ToString());
     }

@@ -1,4 +1,5 @@
 ﻿using Traveler.Objects;
+using Traveler.UnitTest.Lib;
 
 
 namespace Traveler.UnitTest.Objects;
@@ -7,71 +8,32 @@ namespace Traveler.UnitTest.Objects;
 [TestFixture]
 public class StepTest
 {
-	#region Private Helper Methods
-	
-	private Node<int, int, int> CreateTestNode(int id, int data)
-	{
-		return new Node<int, int, int>(id, data);
-	}
-	
-	private Connection<int, int, int> CreateConnection(
-		Node<int, int, int> node1, 
-		Node<int, int, int> node2,
-		int distance,
-		bool connect = true)
-	{
-		var conn = new Connection<int, int, int>(node1, node2) { Distance = distance };
-		
-		if (connect)
-		{
-			node1.Connect(conn);
-			node2.Connect(conn);
-		}
-		
-		return conn;
-	}
-	
-	private Shortcut<int, int, int> CreateShortcut(
-		Node<int, int, int> to, 
-		Node<int, int, int> via,
-		int distance)
-	{
-		return new Shortcut<int, int, int>
-		{
-			To = to,
-			Via = via,
-			Distance = distance
-		};
-	}
-	
-	#endregion
-
-	
 	#region Sanity
 	
 	[Test]
 	public void Sanity_Test()
 	{
-		var node_1 = CreateTestNode(1, 10);
-		var node_2 = CreateTestNode(2, 20);
-		var connection_1 = CreateConnection(node_1, node_2, 12);
+		var node_1 = Create.Node(1, 10);
+		var node_2 = Create.Node(2, 20);
+		var connection_1 = Create.Connection(node_1, node_2, 12);
 		
 		
 		var subject = new Step<int, int, int>(connection_1, node_1);
 		
 	
 		Assert.AreEqual(connection_1, subject.Connection);
-		Assert.AreEqual(12, subject.DistanceTraversed);
+		Assert.AreEqual(12, subject.Distance);
 		Assert.AreEqual(node_1, subject.From);
 		Assert.AreEqual(node_2, subject.To);
+		Assert.AreEqual(12, subject.Distance);
 	}
 	
 	[Test]
 	public void Sanity_FromToSetupCorrectly()
 	{
-		var node_1 = CreateTestNode(1, 10);
-		var node_2 = CreateTestNode(2, 20);
-		var connection_1 = CreateConnection(node_1, node_2, 12);
+		var node_1 = Create.Node(1, 10);
+		var node_2 = Create.Node(2, 20);
+		var connection_1 = Create.Connection(node_1, node_2, 12);
 		
 		
 		var subject_1 = new Step<int, int, int>(connection_1, node_1);
@@ -87,14 +49,15 @@ public class StepTest
 	
 	#endregion
 	
+	
 	#region Test Flip
 	
 	[Test]
 	public void Flip_Test()
 	{
-		var node_1 = CreateTestNode(1, 10);
-		var node_2 = CreateTestNode(2, 20);
-		var connection_1 = CreateConnection(node_1, node_2, 12);
+		var node_1 = Create.Node(1, 10);
+		var node_2 = Create.Node(2, 20);
+		var connection_1 = Create.Connection(node_1, node_2, 12);
 		
 		
 		var subject_1 = new Step<int, int, int>(connection_1, node_1);
@@ -104,7 +67,7 @@ public class StepTest
 		Assert.AreEqual(subject_1.From,	subject_2.To);	
 		Assert.AreEqual(subject_1.To,	subject_2.From);
 		Assert.AreEqual(connection_1,	subject_2.Connection);
-		Assert.AreEqual(12,				subject_2.DistanceTraversed);
+		Assert.AreEqual(12,				subject_2.Distance);
 	}
 	
 	#endregion
@@ -115,14 +78,14 @@ public class StepTest
 	[Test]
 	public void FromShortcut_Test()
 	{
-		var node_1 = CreateTestNode(1, 10);
-		var node_2 = CreateTestNode(2, 20);
-		var node_3 = CreateTestNode(3, 30);
+		var node_1 = Create.Node(1, 10);
+		var node_2 = Create.Node(2, 20);
+		var node_3 = Create.Node(3, 30);
 		
-		var connection_1 = CreateConnection(node_1, node_2, 12);
-		var connection_2 = CreateConnection(node_2, node_3, 12);
+		var connection_1 = Create.Connection(node_1, node_2, 12);
+		var connection_2 = Create.Connection(node_2, node_3, 12);
 		
-		var shortcut = CreateShortcut(node_1, node_2, 33);
+		var shortcut = Create.Shortcut(node_1, node_2, 33);
 		
 		node_3.Shortcut = shortcut;
 		
@@ -140,33 +103,34 @@ public class StepTest
 		Assert.AreEqual(connection_2,	subject_2.Connection);
 		
 		// Distance should not be set
-		Assert.AreEqual(12, subject_1.DistanceTraversed);
-		Assert.AreEqual(12, subject_2.DistanceTraversed);
+		Assert.AreEqual(12, subject_1.Distance);
+		Assert.AreEqual(12, subject_2.Distance);
 	}
 	
 	#endregion
+	
 	
 	#region Test BuildShortcutPath
 	
 	[Test]
 	public void BuildShortcutPath_FlipFalse_Test()
 	{
-	    var node_1 = CreateTestNode(1, 10);
-	    var node_2 = CreateTestNode(2, 20);
-	    var node_3 = CreateTestNode(3, 30);
-	    var node_4 = CreateTestNode(4, 40);
+	    var node_1 = Create.Node(1, 10);
+	    var node_2 = Create.Node(2, 20);
+	    var node_3 = Create.Node(3, 30);
+	    var node_4 = Create.Node(4, 40);
 	    
 	    // Set up connections
-	    var connection_1 = CreateConnection(node_1, node_2, 12);
-	    var connection_2 = CreateConnection(node_2, node_3, 23);
-	    var connection_3 = CreateConnection(node_3, node_4, 34);
+	    var connection_1 = Create.Connection(node_1, node_2, 12);
+	    var connection_2 = Create.Connection(node_2, node_3, 23);
+	    var connection_3 = Create.Connection(node_3, node_4, 34);
 	    
 	    // Set up shortcuts chain: node_4 -> node_3 -> node_2 -> node_1 (shortcut)
 	    node_1.IsShortcut = true;
 	    
-	    node_2.Shortcut = CreateShortcut(node_1, node_1, 10);
-	    node_3.Shortcut = CreateShortcut(node_1, node_2, 20);
-	    node_4.Shortcut = CreateShortcut(node_1, node_3, 30);
+	    node_2.Shortcut = Create.Shortcut(node_1, node_1, 10);
+	    node_3.Shortcut = Create.Shortcut(node_1, node_2, 20);
+	    node_4.Shortcut = Create.Shortcut(node_1, node_3, 30);
 	    
 	    var steps = new List<Step<int, int, int>>();
 	    
@@ -195,22 +159,22 @@ public class StepTest
 	[Test]
 	public void BuildShortcutPath_FlipTrue_Test()
 	{
-	    var node_1 = CreateTestNode(1, 10);
-	    var node_2 = CreateTestNode(2, 20);
-	    var node_3 = CreateTestNode(3, 30);
-	    var node_4 = CreateTestNode(4, 40);
+	    var node_1 = Create.Node(1, 10);
+	    var node_2 = Create.Node(2, 20);
+	    var node_3 = Create.Node(3, 30);
+	    var node_4 = Create.Node(4, 40);
 	    
 	    // Set up connections
-	    var connection_1 = CreateConnection(node_1, node_2, 12);
-	    var connection_2 = CreateConnection(node_2, node_3, 23);
-	    var connection_3 = CreateConnection(node_3, node_4, 34);
+	    var connection_1 = Create.Connection(node_1, node_2, 12);
+	    var connection_2 = Create.Connection(node_2, node_3, 23);
+	    var connection_3 = Create.Connection(node_3, node_4, 34);
 	    
 	    // Set up shortcuts chain: node_4 -> node_3 -> node_2 -> node_1 (shortcut)
 	    node_1.IsShortcut = true;
 	    
-	    node_2.Shortcut = CreateShortcut(node_1, node_1, 10);
-	    node_3.Shortcut = CreateShortcut(node_1, node_2, 20);
-	    node_4.Shortcut = CreateShortcut(node_1, node_3, 30);
+	    node_2.Shortcut = Create.Shortcut(node_1, node_1, 10);
+	    node_3.Shortcut = Create.Shortcut(node_1, node_2, 20);
+	    node_4.Shortcut = Create.Shortcut(node_1, node_3, 30);
 	    
 	    var steps = new List<Step<int, int, int>>();
 	    
@@ -239,16 +203,16 @@ public class StepTest
 	[Test]
 	public void BuildShortcutPath_FromIsNull_ExceptionThrown()
 	{
-	    var node_1 = CreateTestNode(1, 10);
-	    var node_2 = CreateTestNode(2, 20);
-	    var node_3 = CreateTestNode(3, 30);
+	    var node_1 = Create.Node(1, 10);
+	    var node_2 = Create.Node(2, 20);
+	    var node_3 = Create.Node(3, 30);
 	    
-	    CreateConnection(node_1, node_2, 12);
-	    CreateConnection(node_2, node_3, 23);
+	    Create.Connection(node_1, node_2, 12);
+	    Create.Connection(node_2, node_3, 23);
 	    
 	    node_1.IsShortcut = true;
-	    node_2.Shortcut = CreateShortcut(node_1, node_1, 10);
-	    node_3.Shortcut = CreateShortcut(node_1, node_2, 20);
+	    node_2.Shortcut = Create.Shortcut(node_1, node_1, 10);
+	    node_3.Shortcut = Create.Shortcut(node_1, node_2, 20);
 	    
 	    
 	    Assert.Throws<ArgumentNullException>(() => Step<int, int, int>.BuildShortcutPath([], null));
@@ -257,18 +221,18 @@ public class StepTest
 	[Test]
 	public void BuildShortcutPath_OneNodeDoesNotHAveAShortcut_ExceptionThrown()
 	{
-	    var node_1 = CreateTestNode(1, 10);
-	    var node_2 = CreateTestNode(2, 20);
-	    var node_3 = CreateTestNode(3, 30);
+	    var node_1 = Create.Node(1, 10);
+	    var node_2 = Create.Node(2, 20);
+	    var node_3 = Create.Node(3, 30);
 	    
-	    CreateConnection(node_1, node_2, 12);
-	    CreateConnection(node_2, node_3, 23);
+	    Create.Connection(node_1, node_2, 12);
+	    Create.Connection(node_2, node_3, 23);
 	    
 	    node_1.IsShortcut = true;
 	    
 	    // Set an empty shortcut.
 	    node_2.Shortcut = new Shortcut<int, int, int>();
-	    node_3.Shortcut = CreateShortcut(node_1, node_2, 20);
+	    node_3.Shortcut = Create.Shortcut(node_1, node_2, 20);
 	    
 	    
 	    Assert.Throws<InvalidDataException>(() => Step<int, int, int>.BuildShortcutPath([], node_3));

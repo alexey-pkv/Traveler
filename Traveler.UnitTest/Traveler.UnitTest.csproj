@@ -30,6 +30,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Traveler.UnitTest.Lib\Traveler.UnitTest.Lib.csproj" />
       <ProjectReference Include="..\Traveler\Traveler.csproj" />
     </ItemGroup>
 

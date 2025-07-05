@@ -1,13 +1,16 @@
 ﻿namespace Traveler.Objects;
 
 
-public readonly struct Step<I, ND, CD>(Connection<I, ND, CD> connection, Node<I, ND, CD> from)
+public readonly struct Step<I, ND, CD>
+	(
+		Connection<I, ND, CD> connection, 
+		Node<I, ND, CD> from
+	)
 	where I : struct, IComparable<I>
 {
 	#region Properties
 	
 	public Connection<I, ND, CD> Connection { get; } = connection;
-	public double DistanceTraversed { get; } = connection.Distance;
 	public Node<I, ND, CD> From { get; } = from;
 
 	public double Distance => Connection.Distance;
